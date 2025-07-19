@@ -6,7 +6,6 @@ import folium
 import branca
 import config
 import regex
-import time
 import csv
 
 
@@ -51,7 +50,7 @@ class Point:
             self.lte_physical_id
         ]
     
-    def get_coords(self, round_to: int or tuple(int, int) = None) -> tuple[float, float]:
+    def get_coords(self, round_to: int | tuple[int, int] = None) -> tuple[float, float]:
         if round_to is None:
             return (self.latitude, self.longitude)
 
@@ -69,10 +68,8 @@ class Point:
             return (self.latitude, self.longitude)
 
 
-program_start_time = time.time()
 log("Loading CSV Data")
 total_points = 0
-time_start = time.time()
 map_data: list[Point] = []
 data_directory = "data/raw_data"
 pathlist = Path(data_directory).rglob('*.csv')
@@ -93,13 +90,11 @@ for file_path in pathlist:
             map_data.append(data_point)
 
 log(f"CSV loaded into map_data | Total Points: {total_points} | 'Unique' Points Loaded: {len(map_data)}")
-log(f"Time taken to Load CSV: {time.time() - time_start}")
 
 
 if config.Optimisation.distance_prune:
     log("(Optimisation) Starting Distance Prune")
     points_start = len(map_data)
-    start_time = time.time()
     points_removed = 0
     points_checked = 0
 
@@ -124,7 +119,7 @@ if config.Optimisation.distance_prune:
                 points_removed_inner += 1
                 points_removed += 1
 
-    log(f"(Optimisation) Distance Prune Complete: {time.time() - start_time} | Points Removed: {points_removed}/{points_start} | Points Checked: {points_checked}")
+    log(f"(Optimisation) Points Removed: {points_removed}/{points_start} | Points Checked: {points_checked}")
 
 
 total_points = len(map_data)
@@ -166,7 +161,7 @@ for point in map_data:
 
 log(f"Generated Map | Points Added: {len(map_data)}")
 
-input()
+
 if config.Optimisation.cleanup_maps:
     data_directory = "maps"
     pathlist = Path(data_directory).rglob('*.html')
@@ -207,7 +202,4 @@ if config.Optimisation.trim_html_file:
             new_file.write(html_text)
         log("(Optimisation) Wrote trimmed html successfully")
 
-
-program_finish_date = time.time()
-program_runtime = program_finish_date - program_start_time
-log(f"Program Runtime: {program_runtime}")
+log("Program Complete")
